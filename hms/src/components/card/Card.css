@@ -1,69 +1,99 @@
 .card {
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
+  min-width: 20rem;
+  margin: 0 2% 2% 0;
   padding: 1rem;
   border: 1px solid #ccc;
-  border-radius: 4px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
-  transition: all 0.2s ease-in-out;
-  margin-bottom: 1rem;
-  width: 100%;
+  border-radius: 0.5rem;
+  box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.1);
+  box-sizing: border-box;
+  display: inline-block;
+  vertical-align: top;
+}
+
+.card.active {
+  background-color: #dff0d8;
+}
+
+.card.fade {
+  opacity: 0.5;
 }
 
 .time {
   display: flex;
   justify-content: space-between;
-  font-weight: bold;
-  font-size: 1.2rem;
   margin-bottom: 0.5rem;
 }
 
-.start-time,
-.end-time {
-  padding: 0.5rem;
-  background-color: #333;
-  color: #fff;
-  border-radius: 4px;
+.timestamp {
+  font-size: 0.9rem;
+  color: #888;
 }
 
 .content {
-  display: flex;
-  flex-direction: column;
+  font-size: 0.9rem;
+}
+
+.name {
+  font-weight: bold;
   margin-bottom: 0.5rem;
 }
 
+.room-type,
+.room-number,
+.label {
+  font-weight: bold;
+  margin-right: 0.5rem;
+}
+
 .actions {
-  display: flex;
-  justify-content: flex-end;
+  margin-top: 1rem;
 }
 
 .update-button,
 .delete-button {
-  margin-left: 0.5rem;
+  font-size: 0.9rem;
   padding: 0.5rem 1rem;
-  background-color: #333;
-  color: #fff;
-  border: none;
-  border-radius: 4px;
+  border-radius: 0.25rem;
   cursor: pointer;
 }
 
+.update-button {
+  background-color: #5cb85c;
+  color: #fff;
+  margin-right: 0.5rem;
+  border: none;
+}
+
 .delete-button {
-  background-color: red;
+  background-color: #d9534f;
+  color: #fff;
+  border: none;
 }
 
-.active {
-  border-color: green;
-}
-
-.fade {
-  opacity: 0.5;
-}
-
-@media only screen and (min-width: 768px) {
+@media screen and (min-width: 576px) {
   .card {
-    width: 50%;
-    margin: 1rem auto;
+    width: calc(50% - 1rem);
+    margin-right: 1rem;
+  }
+}
+
+@media screen and (min-width: 768px) {
+  .card {
+    width: calc(33.33333333% - 1rem);
+    margin-right: 1rem;
+  }
+}
+
+@media screen and (min-width: 992px) {
+  .card {
+    width: calc(25% - 1rem);
+    margin-right: 1rem;
+  }
+}
+
+@media screen and (min-width: 1200px) {
+  .card {
+    width: calc(20% - 1rem);
+    margin-right: 1rem;
   }
 }

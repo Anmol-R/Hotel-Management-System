@@ -2,7 +2,6 @@ import "./App.css";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Home from "./pages/Home";
 import BookingsPage from "./pages/BookingsPage";
-import FilterPage from "./pages/FilterPage";
 import UpdatePage from "./pages/UpdatePage";
 
 function App() {
@@ -11,7 +10,7 @@ function App() {
       <Routes>
         <Route path="/book" element={<Home />} />
         <Route path="/bookings" element={<BookingsPage />} />
-        <Route path="/update/:id" element={<UpdatePage/>} />
+        <Route path="/update/:id" element={<UpdatePage />} />
       </Routes>
     </BrowserRouter>
   );

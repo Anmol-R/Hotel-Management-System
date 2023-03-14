@@ -56,9 +56,10 @@ const Input = () => {
       endTime: eTime,
       roomType: rmType,
       roomNumber: bookRm,
+      price: price,
     };
     event.preventDefault();
-    if (name && email && stTime && eTime && rmType && rmNo && date) {
+    if (name && email && stTime && eTime && rmType && rmNo && date && price) {
       fetch("http://localhost:8000/bookRoom", {
         method: "POST",
         headers: {
@@ -67,19 +68,24 @@ const Input = () => {
         body: JSON.stringify(data),
       })
         .then((response) => {
-          response.json();
-          setRes(response);
+          if (!response.ok) {
+            throw new Error("Room booking failed");
+          }
+          return response.json();
         })
         .then((data) => {
           console.log(data);
-          Swal.fire("Message sent..!", `Your Room Booked`, "success");
+          Swal.fire("Success!", `Your room has been booked for ${price}`, "success");
         })
-        .catch((error) => console.error(error));
+        .catch((error) => {
+          console.error(error);
+          Swal.fire("Error", "Room booking failed", "error");
+        });
     } else {
       Swal.fire({
         icon: "error",
         title: "Error...!",
-        text: "Fill Every Options!",
+        text: `Error booking the room`,
         confirmButtonText: "Close",
       });
     }
@@ -87,25 +93,24 @@ const Input = () => {
 
   const handleOption2Change = (event) => {
     const selectedValue = event.target.value;
+    const stHour = parseInt(stTime.slice(0, 2), 10);
+    const endHour = parseInt(eTime.slice(0, 2), 10);
+    const hoursDiff = endHour - stHour;
 
     if (selectedValue === "dormatory") {
       setRmNo([1, 2, 3, 4, 5, 6, 7, 8, 9]);
+      setPrice(hoursDiff * pricing.dormatory);
     } else if (selectedValue === "sharing") {
       setRmNo([1, 2, 3, 4, 5, 6]);
+      setPrice(hoursDiff * pricing.sharing);
     } else if (selectedValue === "apartment") {
       setRmNo([1, 2, 3, 4]);
+      setPrice(hoursDiff * pricing.apartment);
     } else {
       setRmNo([]);
+      setPrice(hoursDiff);
     }
-    if (selectedValue === "dormatory") {
-      setPrice(price * 400);
-    }
-    if (selectedValue === "sharing") {
-      setPrice(price * 600);
-    }
-    if (selectedValue === "apartment") {
-      setPrice(price * 800);
-    }
+
     setRmType(selectedValue);
   };
 
@@ -115,11 +120,12 @@ const Input = () => {
 
     const selectedHour = parseInt(selectedValue.slice(0, 2), 10);
     const stHour = parseInt(stTime.slice(0, 2), 10);
-    if (price == 1) {
-      const updatedPrice = price * (selectedHour - stHour);
-      setPrice(updatedPrice);
+    const hoursDiff = selectedHour - stHour;
+
+    if (rmType in pricing) {
+      setPrice(hoursDiff * pricing[rmType]);
     } else {
-      setPrice(selectedHour - stHour);
+      setPrice(hoursDiff);
     }
   };
 

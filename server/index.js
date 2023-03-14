@@ -19,102 +19,143 @@ const connect = async () => {
 };
 
 app.post("/bookRoom", async (req, res) => {
-  const room = await roomData.find({
-    startTime: req.body.startTime,
-    date: req.body.date,
-    bookingActive: true,
-    roomType: req.body.roomType,
-    roomNumber: req.body.roomNumber,
-  });
-  const room3 = await roomData.find({
-    endTime: req.body.endTime,
-    date: req.body.date,
-    bookingActive: true,
-    roomType: req.body.roomType,
-    roomNumber: req.body.roomNumber,
-  });
+  try {
+    const { startTime, endTime, date, roomType, roomNumber, username, price } =
+      req.body;
+    const room = await roomData.find({
+      startTime,
+      date,
+      bookingActive: true,
+      roomType,
+      roomNumber,
+    });
+    const room3 = await roomData.find({
+      endTime,
+      date,
+      bookingActive: true,
+      roomType,
+      roomNumber,
+    });
+    const room2 = await roomData.findOne({
+      startTime,
+      endTime,
+      date,
+      bookingActive: false,
+      roomType,
+      roomNumber,
+    });
 
-  const room2 = await roomData.find({
-    startTime: req.body.startTime,
-    endTime: req.body.endTime,
-    date: req.body.date,
-    bookingActive: false,
-    roomType: req.body.roomType,
-    roomNumber: req.body.roomNumber,
-  });
-
-  if (room.length > 0 || room3.length > 0) {
-    res.send({ booked: false });
-  } else {
-    if (room2.length > 0) {
-      room2.bookingActive = true;
-      res.send({ booked: true });
-    } else {
-      const roomDetails = await new roomData({
-        username: req.body.username,
-        startTime: req.body.startTime,
-        endTime: req.body.endTime,
-        date: req.body.date,
-        roomType: req.body.roomType,
-        roomNumber: req.body.roomNumber,
-        bookingActive: true,
-      });
-      try {
-        let result = await roomDetails.save();
-        const data = new userBooking(req.body);
-        result = await data.save();
-        res.send({ booked: true });
-      } catch (error) {
-        console.log(error);
-      }
+    if (room.length > 0 || room3.length > 0) {
+      return res.status(409).json({ message: "Room is already booked" });
     }
+
+    if (room2) {
+      room2.bookingActive = true;
+      await room2.save();
+      return res.status(200).json({ message: "Room booked successfully" });
+    }
+
+    const newRoom = new roomData({
+      username,
+      startTime,
+      endTime,
+      date,
+      roomType,
+      roomNumber,
+      price,
+      bookingActive: true,
+    });
+    await newRoom.save();
+    const data = new userBooking(req.body);
+    await data.save();
+    return res.status(200).json({ message: "Room booked successfully" });
+  } catch (error) {
+    console.log(error);
+    return res.status(500).json({ message: "Internal server error" });
   }
 });
 
 app.delete("/delete/:id", async (req, res) => {
-  let result = await userBooking.deleteOne({ _id: req.params.id });
+  try {
+    await userBooking.deleteOne({ _id: req.params.id });
 
-  result = await roomData.updateOne(
-    { _id: req.params.id },
-    {
-      bookingActive: "false",
+    const roomDetails = await roomData.findOne({ _id: req.params.id });
+    if (roomDetails) {
+      roomDetails.bookingActive = false;
+      await roomDetails.save();
     }
-  );
-  res.send(result);
+
+    res.status(200).json({ message: "Deleted successfully" });
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ message: "Internal server error" });
+  }
 });
 
 app.put("/update/:id", async (req, res) => {
-  let result = await userBooking.updateOne(
-    { _id: req.params.id },
-    {
-      $set: req.body,
+  try {
+    const updatedBooking = req.body;
+
+    const existingBooking = await userBooking.findOne({
+      ...updatedBooking,
+    });
+
+    const bookingToUpdate = await roomData.findOne({
+      ...updatedBooking,
+      bookingActive: "true",
+    });
+
+    if (existingBooking || bookingToUpdate) {
+      return res.status(409).json({ message: "Booking already exists" });
     }
-  );
-  res.send(result);
+
+    const result = await roomData.updateOne(
+      { _id: req.params.id },
+      { $set: updatedBooking }
+    );
+
+    const result2 = await userBooking.updateOne(
+      { _id: req.params.id },
+      { $set: updatedBooking }
+    );
+
+    res.status(200).json({ message: "Booking updated successfully" });
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ message: "Internal server error" });
+  }
 });
 
-app.get("/bookings", async (req, res) => {
-  let booking = await roomData.find();
-  if (booking.length > 0) {
-    res.send(booking);
-  } else {
-    res.send({ result: "No Booking Find" });
+app.delete("/delete/:id", async (req, res) => {
+  try {
+    await userBooking.deleteOne({ _id: req.params.id });
+
+    await roomData.updateOne({ _id: req.params.id }, { bookingActive: false });
+
+    res.status(200).json({ message: "Booking deleted successfully" });
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ message: "Internal server error" });
   }
 });
 
 app.get("/search", async (req, res) => {
-  const { first, second } = req.query;
+  const { roomType, roomNumber, startTime, endTime } = req.query;
 
   let query = {};
-  if (first && second) {
-    query = { $and: [{ roomType: first }, { roomNumber: second }] };
-  } else if (first && second) {
-    query = { $and: [{ startTime: first }, { endTime: second }] };
-  } else {
-    query = req.query;
+
+  if (roomType && roomNumber) {
+    query = { roomType, roomNumber };
+  } else if (startTime && endTime) {
+    query = { startTime, endTime };
   }
-  let result = await roomData.find(query);
-  res.send(result);
+
+  try {
+    let result = await roomData.find(query);
+    res.send(result);
+  } catch (err) {
+    console.error(err);
+  }
 });
 
 app.listen(8000, () => {

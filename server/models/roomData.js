@@ -1,5 +1,6 @@
 const mongoose = require("mongoose");
 
+
 const room = mongoose.Schema({
   username: {
     type: String,
@@ -18,10 +19,14 @@ const room = mongoose.Schema({
   },
   roomNumber: {
     type: Number,
+    required: true,
   },
   bookingActive: {
     type: String,
   },
+  price : {
+    type : String
+  }
 });
 
 module.exports = mongoose.model("roomData", room);

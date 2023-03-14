@@ -3,24 +3,23 @@ import Swal from "sweetalert2";
 
 const Update = ({ id }) => {
   const [stTime, setStTime] = useState("");
-  const [endTime, setEndTime] = useState([]);
+  const [endTime1, setEndTime1] = useState([]);
   const [eTime, setETime] = useState("");
   const [rmType, setRmType] = useState("");
   const [rmNo, setRmNo] = useState([]);
-  const [updateRm, setUpdateRm] = useState("");
+  const [updateRm, setUpdateRm] = useState(null);
   const [date, setDate] = useState("");
-  const [res, setRes] = useState("");
 
   const time = [
-    "1:00",
-    "2:00",
-    "3:00",
-    "4:00",
-    "5:00",
-    "6:00",
-    "7:00",
-    "8:00",
-    "9:00",
+    "01:00",
+    "02:00",
+    "03:00",
+    "04:00",
+    "05:00",
+    "06:00",
+    "07:00",
+    "08:00",
+    "09:00",
     "10:00",
     "11:00",
     "12:00",
@@ -38,47 +37,64 @@ const Update = ({ id }) => {
     "24:00",
   ];
   const roomType = ["dormatory", "sharing", "apartment"];
-  const pricing = {
-    dormatory: 400,
-    sharing: 600,
-    apartment: 800,
-  };
 
   const handleSubmit = (event) => {
+    event.preventDefault();
     const data = {
       date: date,
       startTime: stTime,
       endTime: eTime,
       roomType: rmType,
-      roomNumber: updateRm,
+      roomNumber: parseInt(updateRm),
     };
-    event.preventDefault();
-    if (stTime && endTime && rmType && rmNo && date) {
-      fetch(`http://localhost:8000/update/${id}`, {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(data),
-      })
-        .then((response) => {
-          console.log(response);
-          return response.json();
-        })
-        .then((data) => {
-          setRes(data);
-          console.log(data);
-          Swal.fire("Updated", `Updated`, "success");
-        })
-        .catch((error) => console.error(error));
-    } else {
+    console.log(data);
+
+    if (!stTime || !eTime || !rmType || !updateRm || !date) {
       Swal.fire({
         icon: "error",
-        title: "Error...!",
-        text: "Fill Every Options!",
+        title: "Error",
+        text: "Please fill in all fields.",
         confirmButtonText: "Close",
       });
+      return;
     }
+
+    fetch(`http://localhost:8000/update/${id}`, {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(data),
+    })
+      .then((response) => {
+        if (response.ok) {
+          return response.json();
+        } else if (response.status === 404) {
+          throw new Error("Booking not found");
+        } else if (response.status === 409) {
+          throw new Error("Booking already exists");
+        } else {
+          throw new Error("Failed to update booking");
+        }
+      })
+      .then((data) => {
+        console.log(data);
+        Swal.fire({
+          icon: "success",
+          title: "Booking Updated",
+          text: "Booking has been successfully updated.",
+          confirmButtonText: "Close",
+        });
+      })
+      .catch((error) => {
+        console.error(error);
+        Swal.fire({
+          icon: "error",
+          title: "Booking Update Failed",
+          text: error.message,
+          confirmButtonText: "Close",
+        });
+      });
   };
 
   const handleOption2Change = (event) => {
@@ -100,9 +116,9 @@ const Update = ({ id }) => {
     const selectedValue = event.target.value;
     setStTime(selectedValue);
     const filteredOptions = time.filter(
-      (option) => parseInt(option) > parseInt(selectedValue)
+      (option) => parseInt(option) >= parseInt(selectedValue)
     );
-    setEndTime(filteredOptions);
+    setEndTime1(filteredOptions);
   };
 
   return (
@@ -121,7 +137,7 @@ const Update = ({ id }) => {
             value={eTime}
             onChange={(event) => setETime(event.target.value)}
           >
-            {endTime.map((value) => (
+            {endTime1.map((value) => (
               <option key={value} value={value}>
                 {value}
               </option>

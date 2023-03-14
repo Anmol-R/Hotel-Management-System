@@ -27,8 +27,11 @@ const userSchema = mongoose.Schema({
   },
   roomNumber: {
     type: Number,
-    require: true,
+    required: true,
   },
+  price : {
+    type : String
+  }
 });
 
 module.exports = mongoose.model("user", userSchema);

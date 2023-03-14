@@ -15,17 +15,11 @@ import Toolbar from "@mui/material/Toolbar";
 import Typography from "@mui/material/Typography";
 import Button from "@mui/material/Button";
 import { Link } from "react-router-dom";
-import { Filter } from "../filter/Filter";
 
 const Navbar = () => {
   const drawerWidth = 240;
-  const navItems = ["book", "bookings", "filter"];
+  const navItems = ["book", "bookings"];
   const [mobileOpen, setMobileOpen] = useState(false);
-  const [isOpen, setIsOpen] = useState(false);
-
-  const toggleFilter = () => {
-    setIsOpen(!isOpen);
-  };
 
   const handleDrawerToggle = () => {
     setMobileOpen((prevState) => !prevState);
@@ -81,26 +75,16 @@ const Navbar = () => {
               </Link>
             </Typography>
             <Box sx={{ display: { xs: "none", sm: "block" } }}>
-              {navItems.map((item, key) =>
-                item !== "filter" ? (
-                  <Link
-                    to={"/" + item}
-                    style={{ textDecoration: "none", color: "black" }}
-                  >
-                    <Button key={item} sx={{ color: "#fff" }}>
-                      {item}
-                    </Button>
-                  </Link>
-                ) : (
-                  <Button
-                    key={item}
-                    sx={{ color: "#fff" }}
-                    onClick={toggleFilter}
-                  >
+              {navItems.map((item, key) => (
+                <Link
+                  to={"/" + item}
+                  style={{ textDecoration: "none", color: "black" }}
+                >
+                  <Button key={item} sx={{ color: "#fff" }}>
                     {item}
                   </Button>
-                )
-              )}
+                </Link>
+              ))}
             </Box>
           </Toolbar>
         </AppBar>
@@ -121,12 +105,6 @@ const Navbar = () => {
           </Drawer>
         </Box>
       </Box>
-
-      {isOpen && (
-        <div className="filter">
-          <Filter />
-        </div>
-      )}
     </>
   );
 };
