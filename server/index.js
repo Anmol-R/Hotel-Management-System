@@ -3,7 +3,6 @@ const cors = require("cors");
 const mongoose = require("mongoose");
 const dotenv = require("dotenv");
 const userBooking = require("./models/userBooking");
-const roomData = require("./models/roomData");
 dotenv.config();
 
 const app = express();
@@ -22,25 +21,22 @@ app.post("/bookRoom", async (req, res) => {
   try {
     const { startTime, endTime, date, roomType, roomNumber, username, price } =
       req.body;
-    const room = await roomData.find({
+    const room = await userBooking.find({
       startTime,
       date,
-      bookingActive: true,
       roomType,
       roomNumber,
     });
-    const room3 = await roomData.find({
+    const room3 = await userBooking.find({
       endTime,
       date,
-      bookingActive: true,
       roomType,
       roomNumber,
     });
-    const room2 = await roomData.findOne({
+    const room2 = await userBooking.findOne({
       startTime,
       endTime,
       date,
-      bookingActive: false,
       roomType,
       roomNumber,
     });
@@ -55,7 +51,7 @@ app.post("/bookRoom", async (req, res) => {
       return res.status(200).json({ message: "Room booked successfully" });
     }
 
-    const newRoom = new roomData({
+    const newRoom = new userBooking({
       username,
       startTime,
       endTime,
@@ -63,11 +59,8 @@ app.post("/bookRoom", async (req, res) => {
       roomType,
       roomNumber,
       price,
-      bookingActive: true,
     });
     await newRoom.save();
-    const data = new userBooking(req.body);
-    await data.save();
     return res.status(200).json({ message: "Room booked successfully" });
   } catch (error) {
     console.log(error);
@@ -78,12 +71,6 @@ app.post("/bookRoom", async (req, res) => {
 app.delete("/delete/:id", async (req, res) => {
   try {
     await userBooking.deleteOne({ _id: req.params.id });
-
-    const roomDetails = await roomData.findOne({ _id: req.params.id });
-    if (roomDetails) {
-      roomDetails.bookingActive = false;
-      await roomDetails.save();
-    }
 
     res.status(200).json({ message: "Deleted successfully" });
   } catch (error) {
@@ -100,20 +87,9 @@ app.put("/update/:id", async (req, res) => {
       ...updatedBooking,
     });
 
-    const bookingToUpdate = await roomData.findOne({
-      ...updatedBooking,
-      bookingActive: "true",
-    });
-
-    if (existingBooking || bookingToUpdate) {
+    if (existingBooking) {
       return res.status(409).json({ message: "Booking already exists" });
     }
-
-    const result = await roomData.updateOne(
-      { _id: req.params.id },
-      { $set: updatedBooking }
-    );
-
     const result2 = await userBooking.updateOne(
       { _id: req.params.id },
       { $set: updatedBooking }
@@ -129,8 +105,6 @@ app.put("/update/:id", async (req, res) => {
 app.delete("/delete/:id", async (req, res) => {
   try {
     await userBooking.deleteOne({ _id: req.params.id });
-
-    await roomData.updateOne({ _id: req.params.id }, { bookingActive: false });
 
     res.status(200).json({ message: "Booking deleted successfully" });
   } catch (error) {
@@ -151,7 +125,7 @@ app.get("/search", async (req, res) => {
   }
 
   try {
-    let result = await roomData.find(query);
+    let result = await userBooking.find(query);
     res.send(result);
   } catch (err) {
     console.error(err);

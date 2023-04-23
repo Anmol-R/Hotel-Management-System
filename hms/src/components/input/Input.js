@@ -1,7 +1,8 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import "./Input.css";
 import Swal from "sweetalert2";
 
+//The time variable is an array of 24-hour times. roomType is an array of room types, and pricing is an object with the room type and its corresponding price.
 const Input = () => {
   const time = [
     "01:00",
@@ -44,8 +45,8 @@ const Input = () => {
   const [rmNo, setRmNo] = useState([]);
   const [bookRm, setBookRm] = useState("");
   const [date, setDate] = useState("");
-  const [res, setRes] = useState("");
   const [price, setPrice] = useState(1);
+
 
   const handleSubmit = (event) => {
     const data = {
@@ -75,7 +76,11 @@ const Input = () => {
         })
         .then((data) => {
           console.log(data);
-          Swal.fire("Success!", `Your room has been booked for ${price}`, "success");
+          Swal.fire(
+            "Success!",
+            `Your room has been booked for ${price}`,
+            "success"
+          );
         })
         .catch((error) => {
           console.error(error);
@@ -90,6 +95,8 @@ const Input = () => {
       });
     }
   };
+
+  //handleOption2Change is called when the user selects a room type.
 
   const handleOption2Change = (event) => {
     const selectedValue = event.target.value;
@@ -114,6 +121,8 @@ const Input = () => {
     setRmType(selectedValue);
   };
 
+  //handleETimeChange is called when the user selects an end time.
+
   const handleETimeChange = (event) => {
     const selectedValue = event.target.value;
     setETime(selectedValue);
@@ -128,6 +137,8 @@ const Input = () => {
       setPrice(hoursDiff);
     }
   };
+
+  //handleOption1Change is called when the user selects a start time.
 
   const handleOption1Change = (event) => {
     const selectedValue = event.target.value;

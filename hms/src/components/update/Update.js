@@ -2,6 +2,9 @@ import React, { useState } from "react";
 import Swal from "sweetalert2";
 
 const Update = ({ id }) => {
+
+  // The component defines several variables using the useState function, such as stTime, endTime1, eTime, rmType, rmNo, updateRm, and date. The component also defines two arrays, time and roomType, which are used to initialize the values for the dropdown menus.
+
   const [stTime, setStTime] = useState("");
   const [endTime1, setEndTime1] = useState([]);
   const [eTime, setETime] = useState("");
@@ -37,6 +40,8 @@ const Update = ({ id }) => {
     "24:00",
   ];
   const roomType = ["dormatory", "sharing", "apartment"];
+
+  // The handleSubmit function is executed when the user submits the form.
 
   const handleSubmit = (event) => {
     event.preventDefault();
@@ -97,6 +102,8 @@ const Update = ({ id }) => {
       });
   };
 
+  // The handleOption2Change function is executed when the user selects a room type from the dropdown menu.
+
   const handleOption2Change = (event) => {
     const selectedValue = event.target.value;
 
@@ -112,6 +119,8 @@ const Update = ({ id }) => {
     setRmType(selectedValue);
   };
 
+  //The handleOption1Change function is executed when the user selects a start time from the dropdown menu.
+  
   const handleOption1Change = (event) => {
     const selectedValue = event.target.value;
     setStTime(selectedValue);

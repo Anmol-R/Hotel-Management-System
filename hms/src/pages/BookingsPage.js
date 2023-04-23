@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
-import Navbar from "../components/navbar/Navbar";
 import Card from "../components/card/Card";
+import Header from "../components/Header";
 
 const BookingsPage = () => {
   const time = [
@@ -42,8 +42,10 @@ const BookingsPage = () => {
   const [data2, setData2] = useState({});
 
   useEffect(() => {
+    // eslint-disable-next-line
     fetchData();
-  },[]);
+    //eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const fetchData = async () => {
     console.log(data2);
@@ -123,7 +125,7 @@ const BookingsPage = () => {
 
   return (
     <div>
-      <Navbar />
+      <Header />
       {loading ? (
         <div className="spinner"></div>
       ) : (
@@ -202,13 +204,7 @@ const BookingsPage = () => {
               </div>
             </div>
           </div>
-          <div
-            style={{
-              marginTop: "45rem",
-              marginRight: "14rem",
-              marginLeft: "2rem",
-            }}
-          >
+          <div className="cardList">
             {data.map((value) => (
               <Card
                 key={value._id}

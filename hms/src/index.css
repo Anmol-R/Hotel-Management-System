@@ -43,3 +43,11 @@
   margin-left: 5rem;
   margin-top: 1rem;
 }
+
+.cardList {
+  display: flex;
+  margin-top: -15rem;
+  margin-left: -10rem;
+  width: 80%;
+  flex-wrap: wrap;
+}

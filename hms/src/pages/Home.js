@@ -1,14 +1,15 @@
 import React from "react";
-import Navbar from "../components/navbar/Navbar";
 import Input from "../components/input/Input";
+import Header from "../components/Header";
 
 const Home = () => {
   return (
-    <div>
-      <Navbar />
+    <div >
+      <Header/> 
       <Input />
     </div>
   );
 };
 
 export default Home;
+ 
